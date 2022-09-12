@@ -38,31 +38,28 @@ function validate(selector, validateCallback) {
   });
 }
 
-function cloneVariableValue(variable, variableClone) {
-  return (variableClone = variable);
-}
+const replaceValue = (val, rootVal) => (val && rootVal ? rootVal : val);
 
-function Validator(options) {
+function Validator(options = {}) {
   const { form, rules, message } = options;
   const formElement = document.querySelector(form);
 
   if (message) {
     const { requiredMessage, emailMessage, passwordMessage } = message;
 
-    REQUIRED_MESSAGE = cloneVariableValue(requiredMessage, REQUIRED_MESSAGE);
-    EMAIL_MESSAGE = cloneVariableValue(emailMessage, EMAIL_MESSAGE);
-    PASSWORD_MESSAGE = cloneVariableValue(passwordMessage, PASSWORD_MESSAGE);
+    REQUIRED_MESSAGE = replaceValue(REQUIRED_MESSAGE, requiredMessage);
+    EMAIL_MESSAGE = replaceValue(EMAIL_MESSAGE, emailMessage);
+    PASSWORD_MESSAGE = replaceValue(PASSWORD_MESSAGE, passwordMessage);
   }
 
-  if (formElement) {
+  if (formElement && rules) {
     const { required, email, password, passwordLength } = rules;
 
-    required.forEach((selector) => validate(selector, ValidatorRequired));
-    email.forEach((selector) => validate(selector, ValidatorEmail));
-    password.forEach((selector) => validate(selector, ValidatorPassword));
+    required?.forEach((selector) => validate(selector, ValidatorRequired));
+    email?.forEach((selector) => validate(selector, ValidatorEmail));
+    password?.forEach((selector) => validate(selector, ValidatorPassword));
 
-    passwordLength &&
-      (PASSWORD_LENGTH = cloneVariableValue(passwordLength, PASSWORD_LENGTH));
+    PASSWORD_LENGTH = replaceValue(PASSWORD_LENGTH, passwordLength);
   }
 }
 
