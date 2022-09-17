@@ -3,6 +3,8 @@ let EMAIL_MESSAGE = "Email is invalid";
 let PASSWORD_MESSAGE = "Password is easy";
 let PASSWORD_LENGTH = 3;
 
+const replaceValue = (val, rootVal) => (val && rootVal ? rootVal : val);
+
 function invalid(invalidElement, invalidResult, message) {
   invalidElement.classList.add("invalid");
   invalidResult.textContent = message;
@@ -20,7 +22,7 @@ function validate(selector, validateCallback) {
     parentElement.appendChild(errorElement);
   }
 
-  element?.addEventListener("blur", function () {
+  element?.addEventListener("input", function () {
     if (!this.value) {
       invalid(this, errorElement, REQUIRED_MESSAGE);
       return;
@@ -37,8 +39,6 @@ function validate(selector, validateCallback) {
     }
   });
 }
-
-const replaceValue = (val, rootVal) => (val && rootVal ? rootVal : val);
 
 function Validator(options = {}) {
   const { form, rules, message } = options;
