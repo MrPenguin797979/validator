@@ -22,7 +22,7 @@ function validate(selector, validateCallback) {
     parentElement.appendChild(errorElement);
   }
 
-  element?.addEventListener("input", function () {
+  element?.addEventListener("blur", function () {
     if (!this.value) {
       invalid(this, errorElement, REQUIRED_MESSAGE);
       return;
