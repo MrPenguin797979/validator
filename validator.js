@@ -1,7 +1,10 @@
 let REQUIRED_MESSAGE = "Please enter this field";
 let EMAIL_MESSAGE = "Email is invalid";
-let PASSWORD_MESSAGE = "Password is easy";
+let PASSWORD_MESSAGE = "Password is invalid";
 let PASSWORD_LENGTH = 3;
+let PASSWORD_LOWERCASE = 1;
+let PASSWORD_UPPERCASE = 1;
+let PASSWORD_NUMBER = 1;
 
 const replaceValue = (val, rootVal) => (val && rootVal ? rootVal : val);
 
@@ -53,13 +56,23 @@ function Validator(options = {}) {
   }
 
   if (formElement && rules) {
-    const { required, email, password, passwordLength } = rules;
+    const { required, email, password } = rules;
+    const {
+      selector: passwordSelectors,
+      length: passwordLength,
+      letter,
+    } = password;
+    const { uppercase, lowercase } = letter;
+
+    PASSWORD_LENGTH = replaceValue(PASSWORD_LENGTH, passwordLength);
+    PASSWORD_UPPERCASE = replaceValue(PASSWORD_UPPERCASE, uppercase);
+    PASSWORD_LOWERCASE = replaceValue(PASSWORD_LOWERCASE, lowercase);
 
     required?.forEach((selector) => validate(selector, ValidatorRequired));
     email?.forEach((selector) => validate(selector, ValidatorEmail));
-    password?.forEach((selector) => validate(selector, ValidatorPassword));
-
-    PASSWORD_LENGTH = replaceValue(PASSWORD_LENGTH, passwordLength);
+    passwordSelectors?.forEach((selector) =>
+      validate(selector, ValidatorPassword)
+    );
   }
 }
 
@@ -81,10 +94,24 @@ function ValidatorEmail(selector) {
   };
 }
 
-function ValidatorPassword(selector, maxLength = PASSWORD_LENGTH) {
+function ValidatorPassword(
+  selector,
+  maxLength = PASSWORD_LENGTH,
+  uppercase = PASSWORD_UPPERCASE,
+  lowercase = PASSWORD_LOWERCASE
+) {
   return {
     selector: selector,
-    check: (value) =>
-      value.length >= maxLength ? undefined : PASSWORD_MESSAGE,
+    check: (value) => {
+      const isHaveUpper =
+        value.match(/[A-Z]/g)?.length >= uppercase ? true : false;
+      const isHaveLower =
+        value.match(/[a-z]/g)?.length >= lowercase ? true : false;
+      const isHaveNumber =
+        value.match(/\d/g)?.length >= PASSWORD_NUMBER ? true : false;
+      const result = isHaveUpper && isHaveLower && isHaveNumber;
+
+      return value.length >= maxLength && result ? undefined : PASSWORD_MESSAGE;
+    },
   };
 }
